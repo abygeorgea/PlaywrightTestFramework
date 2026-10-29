@@ -1,0 +1,41 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Playwright Test Execution & Reports
+/test-results/
+/playwright-report/
+/blob-report/
+/allure-results/
+/allure-report/
+
+# Playwright Local Browser & Cache
+/.playwright/
+/.local-browsers/
+/playwright/.cache/
+
+# Saved Authentication State (Session storage, cookies, etc.)
+/playwright/.auth/
+.auth/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.env
+
+# IDE / System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
