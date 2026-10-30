@@ -1,12 +1,14 @@
 import { Page, Locator } from '@playwright/test';
+import { Logger } from '../Utils/logger';
 
 export class SummaryPage {
   readonly page: Page;
-  readonly checkoutButton: Locator;
+  readonly goToCheckoutButton: Locator;
+  private readonly log = new Logger('SummaryPage');
 
   constructor(page: Page) {
     this.page = page;
-    this.checkoutButton = page.getByRole('button', { name: 'Go to checkout' });
+    this.goToCheckoutButton = page.getByRole('button', { name: 'Go to checkout' });
   }
 
   async validateTicketDetails(expectedDetails: {
@@ -15,11 +17,17 @@ export class SummaryPage {
     amount?: string;
     totalAmount?: string;
   }): Promise<boolean> {
-    console.log('Skipping validation; hardcoded pass for details:', expectedDetails);
+    this.log.warn('Skipping validation; hardcoded pass for details:', expectedDetails);
     return true;
   }
 
   async goToCheckout() {
-    await this.checkoutButton.click();
+    this.log.info('Going to checkout');
+    await this.page.waitForLoadState('networkidle');
+    await this.goToCheckoutButton.waitFor({ state: 'visible' });
+    await this.goToCheckoutButton.click();
+    await this.goToCheckoutButton.waitFor({ state: 'hidden' });
+    await this.page.waitForLoadState('domcontentloaded');
+    this.log.info('Checkout page loaded');
   }
 }

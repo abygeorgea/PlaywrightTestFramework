@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { Logger } from '../Utils/logger';
 
 export class CheckoutPage {
   readonly page: Page;
@@ -11,6 +12,7 @@ export class CheckoutPage {
   readonly eventTermsCheckbox: Locator;
   readonly paymentMethodSection: Locator;
   readonly submitButton: Locator;
+  private readonly log = new Logger('CheckoutPage');
 
   constructor(page: Page) {
     this.page = page;
@@ -36,6 +38,7 @@ export class CheckoutPage {
     suburb: string;
     postcode: string;
   }) {
+    this.log.info('Filling contact and address details');
     await this.mobilePhoneInput.fill(details.mobile);
     await this.addressLine1Input.fill(details.addressLine1);
 
@@ -49,15 +52,18 @@ export class CheckoutPage {
   }
 
   async acceptTermsAndConditions() {
+    this.log.info('Accepting terms and conditions');
     await this.venueTermsCheckbox.check();
     await this.eventTermsCheckbox.check();
   }
 
   async expandPaymentOptions() {
+    this.log.info('Expanding payment options');
     await this.paymentMethodSection.click();
   }
 
   async submitPayment() {
+    this.log.info('Submitting payment');
     await this.submitButton.click();
   }
 }

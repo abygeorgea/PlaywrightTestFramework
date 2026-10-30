@@ -1,10 +1,12 @@
 import { Page, Locator } from '@playwright/test';
+import { Logger } from '../Utils/logger';
 
 export class ConfirmationPage {
   readonly page: Page;
   readonly confirmationHeading: Locator;
   readonly customerIdText: Locator;
   readonly modalCloseButton: Locator;
+  private readonly log = new Logger('ConfirmationPage');
 
   constructor(page: Page) {
     this.page = page;
@@ -18,14 +20,18 @@ export class ConfirmationPage {
 
   async getConfirmationMessage(): Promise<string | null> {
     await this.confirmationHeading.click();
-    return await this.confirmationHeading.textContent();
+    const message = await this.confirmationHeading.textContent();
+    this.log.info(`Confirmation message: '${message}'`);
+    return message;
   }
 
   async clickCustomerId() {
+    this.log.info('Clicking customer ID');
     await this.customerIdText.click();
   }
 
   async closeWelcomeModal() {
+    this.log.info('Closing welcome modal');
     await this.modalCloseButton.click();
   }
 }
