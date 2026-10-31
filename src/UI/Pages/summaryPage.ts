@@ -25,7 +25,7 @@ export class SummaryPage {
     this.eventTitle = page.getByRole('heading', { level: 1 });
 
     this.yourTicketsHeading = page.getByRole('heading', { name: 'Your Tickets' });
-    this.ticketArticles = page.locator('article');
+    this.ticketArticles = page.getByRole('article');
     this.deliveryMethodLabel = page.getByText('Delivery Method', { exact: true });
 
     this.orderSummaryHeading = page.getByRole('heading', { name: 'Order Summary' });

@@ -14,7 +14,7 @@ export class LoginPage {
     this.page = page;
 
     this.menuButton = page.getByRole('link', { name: 'dehaze' });
-    this.signInNavButton = page.getByRole('link', { name: ' Sign In / Sign up' });
+    this.signInNavButton = page.getByRole('link', { name: /Sign In \/ Sign up/ });
 
     this.emailInput = page.getByRole('textbox', { name: 'Email*' });
     this.passwordInput = page.getByRole('textbox', { name: 'Password*' });

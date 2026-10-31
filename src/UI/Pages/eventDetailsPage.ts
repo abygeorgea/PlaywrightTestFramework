@@ -3,13 +3,11 @@ import { Logger } from '../Utils/logger';
 
 export class EventDetailsPage {
   readonly page: Page;
-  readonly deliveryMethodContainer: Locator;
   readonly nextButton: Locator;
   private readonly log = new Logger('EventDetailsPage');
 
   constructor(page: Page) {
     this.page = page;
-    this.deliveryMethodContainer = page.locator('#delivery-methods, .delivery-options');
     this.nextButton = page.getByRole('button', { name: 'Next' });
   }
 
@@ -57,9 +55,7 @@ export class EventDetailsPage {
   async selectDeliveryMethod(methodText: string) {
     this.log.info(`Selecting delivery method '${methodText}'`);
     const radio = this.page.getByRole('radio', { name: methodText });
-    const radioId = await radio.getAttribute('id');
-    await this.page.locator(`label.delTypeText[for="${radioId}"]`).click();
-    await radio.waitFor({ state: 'attached' });
+    await this.page.getByText(methodText, { exact: true }).click();
     if (!(await radio.isChecked())) {
       this.log.error(`Delivery method '${methodText}' was not selected`);
       throw new Error(`Delivery method '${methodText}' was not selected`);

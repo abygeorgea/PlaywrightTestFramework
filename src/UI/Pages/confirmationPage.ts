@@ -14,7 +14,8 @@ export class ConfirmationPage {
     this.customerIdText = page.getByText('Customer ID:');
 
     this.modalCloseButton = page
-      .frameLocator('iframe[title="Modal Message"]')
+      .getByTitle('Modal Message')
+      .contentFrame()
       .getByRole('button', { name: 'Close Message' });
   }
 

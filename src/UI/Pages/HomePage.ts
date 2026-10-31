@@ -11,7 +11,7 @@ export class HomePage {
   constructor(page: Page) {
     this.page = page;
     this.cookieCloseButton = page.getByRole('button', { name: 'Close' });
-    this.priceCategoryDropdown = page.locator('#p');
+    this.priceCategoryDropdown = page.getByRole('combobox');
     this.findTicketsButton = page.getByRole('button', { name: 'Find Tickets' });
   }
 
@@ -43,11 +43,7 @@ export class HomePage {
 
   async selectPriceByTextAndFindTickets(optionText: string, occurrence: number = 0) {
     this.log.info(`Selecting option '${optionText}' (occurrence ${occurrence}) and clicking Find Tickets`);
-    const escaped = optionText.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const option = this.priceCategoryDropdown
-      .locator('option')
-      .filter({ hasText: new RegExp(`^\\s*${escaped}\\s*$`) })
-      .nth(occurrence);
+    const option = this.page.getByRole('option', { name: optionText, exact: true }).nth(occurrence);
     const value = await option.getAttribute('value');
     await this.priceCategoryDropdown.selectOption(value!);
     await this.findTicketsButton.click();

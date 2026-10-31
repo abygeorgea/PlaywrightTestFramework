@@ -61,11 +61,13 @@ export class CheckoutPage {
     this.log.info('Expanding payment options');
     await this.paymentMethodSection.click();
     await this.page.waitForLoadState('domcontentloaded');
+    await this.submitPayment();
   }
 
- /*  async submitPayment() {
+  async submitPayment() {
     this.log.info('Submitting payment');
+    await this.submitButton.waitFor({ state: 'visible' });
     await this.submitButton.click();
-        await this.page.waitForLoadState('domcontentloaded');
-  } */
+    await this.page.waitForLoadState('domcontentloaded');
+  }
 }
