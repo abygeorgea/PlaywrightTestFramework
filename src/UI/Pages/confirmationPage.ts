@@ -1,39 +1,11 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
 
-export class ConfirmationPage {
-  readonly page: Page;
+export class ConfirmationPage extends BasePage {
   readonly confirmationHeading: Locator;
-  readonly customerIdText: Locator;
-  readonly modalCloseButton: Locator;
-  private readonly log = new Logger('ConfirmationPage');
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.confirmationHeading = page.getByRole('heading', { name: 'Order Confirmed' });
-    this.customerIdText = page.getByText('Customer ID:');
-
-    this.modalCloseButton = page
-      .getByTitle('Modal Message')
-      .contentFrame()
-      .getByRole('button', { name: 'Close Message' });
-  }
-
-  async getConfirmationMessage(): Promise<string | null> {
-    await this.confirmationHeading.waitFor({ state: 'visible' });
-    await this.confirmationHeading.click();
-    const message = await this.confirmationHeading.textContent();
-    this.log.info(`Confirmation message: '${message}'`);
-    return message;
-  }
-
-  async clickCustomerId() {
-    this.log.info('Clicking customer ID');
-    await this.customerIdText.click();
-  }
-
-  async closeWelcomeModal() {
-    this.log.info('Closing welcome modal');
-    await this.modalCloseButton.click();
   }
 }

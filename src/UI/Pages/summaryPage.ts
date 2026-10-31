@@ -1,10 +1,7 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
 
-export class SummaryPage {
-  readonly page: Page;
-  private readonly log = new Logger('SummaryPage');
-
+export class SummaryPage extends BasePage {
   readonly eventTitle: Locator;
 
   readonly yourTicketsHeading: Locator;
@@ -20,7 +17,7 @@ export class SummaryPage {
   readonly cancelButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
 
     this.eventTitle = page.getByRole('heading', { level: 1 });
 

@@ -1,29 +1,21 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
+import { config } from '../Utils/config';
 
-export class HomePage {
-  readonly page: Page;
+export class HomePage extends BasePage {
   readonly priceCategoryDropdown: Locator;
   readonly findTicketsButton: Locator;
   readonly cookieCloseButton: Locator;
-  private readonly log = new Logger('HomePage');
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.cookieCloseButton = page.getByRole('button', { name: 'Close' });
     this.priceCategoryDropdown = page.getByRole('combobox');
     this.findTicketsButton = page.getByRole('button', { name: 'Find Tickets' });
   }
 
-  async goto(eventId: string) {
-    const baseUrl = process.env.url;
-    if (!baseUrl) {
-      this.log.error("Environment variable 'url' is not set");
-      throw new Error("Environment variable 'url' is not set");
-    }
-    const url = `${baseUrl}?sh=${encodeURIComponent(eventId)}`;
-    this.log.info(`Navigating to ${url}`);
-    await this.page.goto(url);
+  async openEvent(eventId: string) {
+    await this.goto(`${config.url}?sh=${encodeURIComponent(eventId)}`);
   }
 
   async closeCookiePopup() {

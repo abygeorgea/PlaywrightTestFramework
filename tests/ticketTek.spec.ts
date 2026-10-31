@@ -1,13 +1,8 @@
-import fs from 'fs';
-import path from 'path';
 import { test, expect } from '../src/UI/Fixtures/pages.fixture';
 import { PurchaseTicketScenario } from '../src/UI/Models/purchaseTicketScenario';
+import scenarioData from '../testdata/purchaseTicketScenario.json';
 
-const scenarios: PurchaseTicketScenario[] = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '../testdata/purchaseTicketScenario.json'), 'utf-8')
-);
-
-//const testData = scenarios.filter((scenario) => scenario.testCaseId === 'TC002');
+const scenarios = scenarioData as PurchaseTicketScenario[];
 
 for (const data of scenarios) {
   test(`${data.testCaseId}: ${data.description}`, async ({
@@ -17,29 +12,36 @@ for (const data of scenarios) {
     checkoutPage,
     confirmationPage,
   }) => {
-    await homePage.goto(data.eventId);
-    await homePage.closeCookiePopup();
+    await test.step('Open the event page and choose a performance', async () => {
+      await homePage.openEvent(data.eventId);
+      await homePage.closeCookiePopup();
+      await homePage.selectPriceByTextAndFindTickets(data.performance.text, data.performance.occurrence);
+    });
 
-    // Step 1: Search from Home/Landing Page
-    await homePage.selectPriceByTextAndFindTickets(data.performance.text, data.performance.occurrence);
+    await test.step('Configure tickets and delivery', async () => {
+      await eventDetailsPage.selectTicketByPrice(data.priceText);
+      await eventDetailsPage.adjustTicketQuantity(data.ticket.type, data.ticket.action, data.ticket.clicks);
+      await eventDetailsPage.selectDeliveryMethod(data.deliveryMethod);
+      await eventDetailsPage.proceedToNext();
+    });
 
-    // Step 2: Configure tickets on Event Details page
-    await eventDetailsPage.selectTicketByPrice(data.priceText);
-    await eventDetailsPage.adjustTicketQuantity(data.ticket.type, data.ticket.action, data.ticket.clicks);
-    await eventDetailsPage.selectDeliveryMethod(data.deliveryMethod);
-    await eventDetailsPage.proceedToNext();
+    await test.step('Review the order summary and go to checkout', async () => {
+      await summaryPage.validateTicketDetails(data.summary);
+      await summaryPage.goToCheckout();
+    });
 
-    // Step 3: Order Summary Validation & Checkout
-    await summaryPage.validateTicketDetails(data.summary);
-    await summaryPage.goToCheckout();
+    await test.step('Complete checkout details and pay', async () => {
+      await checkoutPage.fillContactAndAddressDetails(data.checkout);
+      await checkoutPage.acceptTermsAndConditions();
+      await checkoutPage.expandPaymentOptions();
+      await checkoutPage.submitPayment();
+    });
 
-    // Step 4: Checkout Delivery Form & Terms Submission
-    await checkoutPage.fillContactAndAddressDetails(data.checkout);
-    await checkoutPage.acceptTermsAndConditions();
-    await checkoutPage.confirmPurchase();
-
-    // 5. Confirmation Verification
-    const text = await confirmationPage.getConfirmationMessage();
-    expect(text).toContain(data.expectedConfirmation);
+    await test.step('Verify the order confirmation', async () => {
+      await expect(
+        confirmationPage.confirmationHeading,
+        'Order confirmation heading should be displayed after payment'
+      ).toContainText(data.expectedConfirmation);
+    });
   });
 }

@@ -1,17 +1,15 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
 
-export class LoginPage {
-  readonly page: Page;
+export class LoginPage extends BasePage {
   readonly menuButton: Locator;
   readonly signInNavButton: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly signInSubmitButton: Locator;
-  private readonly log = new Logger('LoginPage');
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
 
     this.menuButton = page.getByRole('link', { name: 'dehaze' });
     this.signInNavButton = page.getByRole('link', { name: /Sign In \/ Sign up/ });

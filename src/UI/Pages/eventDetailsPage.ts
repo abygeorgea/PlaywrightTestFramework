@@ -1,13 +1,11 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
 
-export class EventDetailsPage {
-  readonly page: Page;
+export class EventDetailsPage extends BasePage {
   readonly nextButton: Locator;
-  private readonly log = new Logger('EventDetailsPage');
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.nextButton = page.getByRole('button', { name: 'Next' });
   }
 
@@ -41,15 +39,6 @@ export class EventDetailsPage {
       this.log.error(`Failed to ${action} quantity for '${ticketText}'`, error);
       throw error;
     }
-  }
-
-  async getTicketQuantity(ticketText: string): Promise<number> {
-    const text = await this.ticketButton(ticketText, 'decrease')
-      .locator('xpath=following-sibling::*[1]')
-      .innerText();
-    const quantity = parseInt(text.trim(), 10);
-    this.log.info(`Quantity for '${ticketText}' is ${quantity}`);
-    return quantity;
   }
 
   async selectDeliveryMethod(methodText: string) {

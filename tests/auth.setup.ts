@@ -1,22 +1,23 @@
-import fs from 'fs';
-import path from 'path';
 import { test as setup } from '../src/UI/Fixtures/pages.fixture';
-import { AUTH_FILE } from '../src/UI/Fixtures/auth.fixture';
-import { PurchaseTicketScenario } from '../src/UI/Models/purchaseTicketScenario';
-
-const scenarios: PurchaseTicketScenario[] = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '../testdata/purchaseTicketScenario.json'), 'utf-8')
-);
+import { AUTH_FILE } from '../src/UI/Utils/paths';
+import { config } from '../src/UI/Utils/config';
+import scenarioData from '../testdata/purchaseTicketScenario.json';
 
 setup('authenticate', async ({ page, homePage, loginPage }) => {
-  const email = process.env.emailAddress!;
-  const password = process.env.password!;
+  const [firstScenario] = scenarioData;
 
-  await homePage.goto(scenarios[0].eventId);
-  await homePage.closeCookiePopup();
-  await loginPage.openSignInModal();
-  await loginPage.login(email, password);
-  await loginPage.waitForLoginComplete();
+  await setup.step('Open the event page and dismiss the cookie popup', async () => {
+    await homePage.openEvent(firstScenario.eventId);
+    await homePage.closeCookiePopup();
+  });
 
-  await page.context().storageState({ path: AUTH_FILE });
+  await setup.step('Sign in', async () => {
+    await loginPage.openSignInModal();
+    await loginPage.login(config.emailAddress, config.password);
+    await loginPage.waitForLoginComplete();
+  });
+
+  await setup.step('Save the authenticated session', async () => {
+    await page.context().storageState({ path: AUTH_FILE });
+  });
 });

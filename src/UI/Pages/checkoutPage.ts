@@ -1,21 +1,18 @@
 import { Page, Locator } from '@playwright/test';
-import { Logger } from '../Utils/logger';
+import { BasePage } from './basePage';
 
-export class CheckoutPage {
-  readonly page: Page;
+export class CheckoutPage extends BasePage {
   readonly mobilePhoneInput: Locator;
   readonly addressLine1Input: Locator;
   readonly addressLine2Input: Locator;
   readonly suburbInput: Locator;
   readonly postcodeInput: Locator;
-  readonly venueTermsCheckbox: Locator;
-  readonly eventTermsCheckbox: Locator;
+  readonly termsCheckboxes: Locator;
   readonly paymentMethodSection: Locator;
   readonly submitButton: Locator;
-  private readonly log = new Logger('CheckoutPage');
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
 
     this.mobilePhoneInput = page.getByRole('textbox', { name: 'Mobile phone*' });
     this.addressLine1Input = page.getByRole('textbox', { name: 'Address line 1*' });
@@ -23,10 +20,9 @@ export class CheckoutPage {
     this.suburbInput = page.getByRole('textbox', { name: 'Suburb*' });
     this.postcodeInput = page.getByRole('textbox', { name: 'Postcode*' });
 
-    this.venueTermsCheckbox = page.getByRole('checkbox', { name: 'I have read and agree to the terms and conditions for Enmore Theatre' });
-    this.eventTermsCheckbox = page.getByRole('checkbox', { name: 'I have read and agree to the terms and conditions for ESPLOAD' });
+    this.termsCheckboxes = page.getByRole('checkbox', { name: /terms and conditions/i });
 
-    this.paymentMethodSection = page.getByText('Select Payment Method Use Gift Vouchers Voucher ID Redeem Apple Logo Credit');
+    this.paymentMethodSection = page.getByRole('heading', { name: 'Select Payment Method' });
 
     this.submitButton = page.getByRole('button', { name: 'Submit payment' });
   }
@@ -53,15 +49,20 @@ export class CheckoutPage {
 
   async acceptTermsAndConditions() {
     this.log.info('Accepting terms and conditions');
-    await this.venueTermsCheckbox.check();
-    await this.eventTermsCheckbox.check();
+    await this.termsCheckboxes.first().waitFor({ state: 'visible' });
+    for (const checkbox of await this.termsCheckboxes.all()) {
+      await checkbox.check();
+    }
   }
 
-  async confirmPurchase() {
-    this.log.info('Expanding payment options');
-    await this.paymentMethodSection.click();
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.submitPayment();
+  async expandPaymentOptions() {
+    await this.submitButton.waitFor({ state: 'visible' });
+    if (await this.paymentMethodSection.isVisible()) {
+      this.log.info('Expanding payment options');
+      await this.paymentMethodSection.click();
+    } else {
+      this.log.info('No payment method selection shown; skipping');
+    }
   }
 
   async submitPayment() {
