@@ -19,6 +19,7 @@ export class ConfirmationPage {
   }
 
   async getConfirmationMessage(): Promise<string | null> {
+    await this.confirmationHeading.waitFor({ state: 'visible' });
     await this.confirmationHeading.click();
     const message = await this.confirmationHeading.textContent();
     this.log.info(`Confirmation message: '${message}'`);

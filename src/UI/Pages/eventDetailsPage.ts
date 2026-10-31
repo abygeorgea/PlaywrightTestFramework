@@ -56,7 +56,14 @@ export class EventDetailsPage {
 
   async selectDeliveryMethod(methodText: string) {
     this.log.info(`Selecting delivery method '${methodText}'`);
-    await this.page.getByRole('radio', { name: methodText }).check();
+    const radio = this.page.getByRole('radio', { name: methodText });
+    const radioId = await radio.getAttribute('id');
+    await this.page.locator(`label.delTypeText[for="${radioId}"]`).click();
+    await radio.waitFor({ state: 'attached' });
+    if (!(await radio.isChecked())) {
+      this.log.error(`Delivery method '${methodText}' was not selected`);
+      throw new Error(`Delivery method '${methodText}' was not selected`);
+    }
   }
 
   async proceedToNext() {

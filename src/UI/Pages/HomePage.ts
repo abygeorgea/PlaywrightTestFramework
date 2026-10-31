@@ -15,9 +15,15 @@ export class HomePage {
     this.findTicketsButton = page.getByRole('button', { name: 'Find Tickets' });
   }
 
-  async goto() {
-    this.log.info('Navigating to the show page');
-    await this.page.goto('https://premier.ticketek.com.au/shows/show.aspx?sh=ESPLOAD');
+  async goto(eventId: string) {
+    const baseUrl = process.env.url;
+    if (!baseUrl) {
+      this.log.error("Environment variable 'url' is not set");
+      throw new Error("Environment variable 'url' is not set");
+    }
+    const url = `${baseUrl}?sh=${encodeURIComponent(eventId)}`;
+    this.log.info(`Navigating to ${url}`);
+    await this.page.goto(url);
   }
 
   async closeCookiePopup() {

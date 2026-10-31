@@ -60,10 +60,12 @@ export class CheckoutPage {
   async confirmPurchase() {
     this.log.info('Expanding payment options');
     await this.paymentMethodSection.click();
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
-  async submitPayment() {
+ /*  async submitPayment() {
     this.log.info('Submitting payment');
     await this.submitButton.click();
-  }
+        await this.page.waitForLoadState('domcontentloaded');
+  } */
 }

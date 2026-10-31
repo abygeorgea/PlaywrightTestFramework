@@ -1,47 +1,45 @@
+import fs from 'fs';
+import path from 'path';
 import { test, expect } from '../src/UI/Fixtures/pages.fixture';
+import { PurchaseTicketScenario } from '../src/UI/Models/purchaseTicketScenario';
 
-test('Purchase tickets', async ({ homePage, eventDetailsPage, summaryPage, checkoutPage, confirmationPage }) => {
-  await homePage.goto();
-  await homePage.closeCookiePopup();
+const scenarios: PurchaseTicketScenario[] = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, '../testdata/purchaseTicketScenario.json'), 'utf-8')
+);
 
-  // Step 1: Search from Home/Landing Page
-  await homePage.selectPriceByTextAndFindTickets('Mon 30 Apr 2029 12:03PM', 1);
+//const testData = scenarios.filter((scenario) => scenario.testCaseId === 'TC002');
 
-  // Step 2: Configure tickets on Event Details page
-  await eventDetailsPage.selectTicketByPrice('$0.00†');
-  
-  // Update ticket count for "Admit" tickets by clicking '+' once
-  await eventDetailsPage.adjustTicketQuantity('Admit', 'increase', 1);
-  
-  await eventDetailsPage.selectDeliveryMethod('Mobile Ticket No Additional');
-  await eventDetailsPage.proceedToNext();
+for (const data of scenarios) {
+  test(`${data.testCaseId}: ${data.description}`, async ({
+    homePage,
+    eventDetailsPage,
+    summaryPage,
+    checkoutPage,
+    confirmationPage,
+  }) => {
+    await homePage.goto(data.eventId);
+    await homePage.closeCookiePopup();
 
-   // Step 3: Order Summary Validation & Checkout
-  await summaryPage.validateTicketDetails({
-    section: 'General Admission',
-    ticketType: 'Admit',
-    amount: '$0.00',
-    totalAmount: '$0.00'
+    // Step 1: Search from Home/Landing Page
+    await homePage.selectPriceByTextAndFindTickets(data.performance.text, data.performance.occurrence);
+
+    // Step 2: Configure tickets on Event Details page
+    await eventDetailsPage.selectTicketByPrice(data.priceText);
+    await eventDetailsPage.adjustTicketQuantity(data.ticket.type, data.ticket.action, data.ticket.clicks);
+    await eventDetailsPage.selectDeliveryMethod(data.deliveryMethod);
+    await eventDetailsPage.proceedToNext();
+
+    // Step 3: Order Summary Validation & Checkout
+    await summaryPage.validateTicketDetails(data.summary);
+    await summaryPage.goToCheckout();
+
+    // Step 4: Checkout Delivery Form & Terms Submission
+    await checkoutPage.fillContactAndAddressDetails(data.checkout);
+    await checkoutPage.acceptTermsAndConditions();
+    await checkoutPage.confirmPurchase();
+
+    // 5. Confirmation Verification
+    const text = await confirmationPage.getConfirmationMessage();
+    expect(text).toContain(data.expectedConfirmation);
   });
-  
-  await summaryPage.goToCheckout();
-
-  // Step 4: Checkout Delivery Form & Terms Submission
-  await checkoutPage.fillContactAndAddressDetails({
-    mobile: '0410111111',
-    addressLine1: '255 george st25',
-    addressLine2: '23',
-    suburb: 'Sydney',
-    postcode: '2001'
-  });
-  await checkoutPage.acceptTermsAndConditions();
-  await checkoutPage.confirmPurchase();
-
-
-  // 5. Confirmation Verification
-  const text = await confirmationPage.getConfirmationMessage();
-  expect(text).toContain('Order Confirmed');
-
-  //await confirmationPage.clickCustomerId();
-  //wait confirmationPage.closeWelcomeModal();
-});
+}
