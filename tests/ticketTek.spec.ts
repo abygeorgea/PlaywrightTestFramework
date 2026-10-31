@@ -1,33 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../src/UI/Pages/HomePage.ts';
-import { EventDetailsPage } from '../src/UI/Pages/eventDetailsPage.ts';
-import { SummaryPage } from '../src/UI/Pages/summaryPage.ts';
-import { CheckoutPage } from '../src/UI/Pages/checkoutPage.ts';
-import { ConfirmationPage } from '../src/UI/Pages/confirmationPage.ts';
-import { LoginPage } from '../src/UI/Pages/loginPage.ts';
+import { test, expect } from '../src/UI/Fixtures/pages.fixture';
 
-test('Login and purchase tickets', async ({ page }) => {
-  const homePage = new HomePage(page);
-  const eventDetailsPage = new EventDetailsPage(page);
-  const summaryPage = new SummaryPage(page);
-  const checkoutPage = new CheckoutPage(page);
-  const confirmationPage = new ConfirmationPage(page);
-  const loginPage = new LoginPage(page);
-      
-
-   // 0. Authentication
-
-  // Retrieve credentials securely from process.env
-  const email = process.env.emailAddress!;
-  const password = process.env.password!;
+test('Purchase tickets', async ({ homePage, eventDetailsPage, summaryPage, checkoutPage, confirmationPage }) => {
   await homePage.goto();
   await homePage.closeCookiePopup();
-  await loginPage.openSignInModal();
-  await loginPage.login(email, password);
 
   // Step 1: Search from Home/Landing Page
-  await homePage.goto();
-  await homePage.selectPriceAndFindTickets('EMIS2029726AG');
+  await homePage.selectPriceByTextAndFindTickets('Mon 30 Apr 2029 12:03PM', 1);
 
   // Step 2: Configure tickets on Event Details page
   await eventDetailsPage.selectTicketByPrice('$0.00†');
@@ -57,7 +35,7 @@ test('Login and purchase tickets', async ({ page }) => {
     postcode: '2001'
   });
   await checkoutPage.acceptTermsAndConditions();
-  await checkoutPage.expandPaymentOptions();
+  await checkoutPage.confirmPurchase();
 
 
   // 5. Confirmation Verification

@@ -29,9 +29,21 @@ export class HomePage {
     }
   }
 
-  async selectPriceAndFindTickets(optionValue: string) {
+  async selectPriceByValueAndFindTickets(optionValue: string) {
     this.log.info(`Selecting price option '${optionValue}' and clicking Find Tickets`);
     await this.priceCategoryDropdown.selectOption(optionValue);
+    await this.findTicketsButton.click();
+  }
+
+  async selectPriceByTextAndFindTickets(optionText: string, occurrence: number = 0) {
+    this.log.info(`Selecting option '${optionText}' (occurrence ${occurrence}) and clicking Find Tickets`);
+    const escaped = optionText.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const option = this.priceCategoryDropdown
+      .locator('option')
+      .filter({ hasText: new RegExp(`^\\s*${escaped}\\s*$`) })
+      .nth(occurrence);
+    const value = await option.getAttribute('value');
+    await this.priceCategoryDropdown.selectOption(value!);
     await this.findTicketsButton.click();
   }
 }

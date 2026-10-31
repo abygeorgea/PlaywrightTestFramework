@@ -57,7 +57,7 @@ export class CheckoutPage {
     await this.eventTermsCheckbox.check();
   }
 
-  async expandPaymentOptions() {
+  async confirmPurchase() {
     this.log.info('Expanding payment options');
     await this.paymentMethodSection.click();
   }

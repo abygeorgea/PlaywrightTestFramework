@@ -34,4 +34,10 @@ export class LoginPage {
     await this.passwordInput.fill(password);
     await this.signInSubmitButton.click();
   }
+
+  async waitForLoginComplete() {
+    await this.emailInput.waitFor({ state: 'hidden' });
+    await this.page.waitForLoadState('domcontentloaded');
+    this.log.info('Login complete');
+  }
 }
