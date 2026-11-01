@@ -48,7 +48,7 @@ export class SummaryPage extends BasePage {
     this.log.info('Summary page fully loaded');
   }
 
-  async validateTicketDetails(expectedDetails: {
+ /*  async validateTicketDetails(expectedDetails: {
     section?: string;
     ticketType?: string;
     amount?: string;
@@ -57,7 +57,7 @@ export class SummaryPage extends BasePage {
     await this.waitForPageLoaded();
     this.log.warn('Skipping validation; hardcoded pass for details:', expectedDetails);
     return true;
-  }
+  } */
 
   async goToCheckout() {
     this.log.info('Going to checkout');

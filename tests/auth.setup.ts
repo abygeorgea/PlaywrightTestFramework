@@ -6,9 +6,8 @@ import scenarioData from '../testdata/purchaseTicketScenario.json';
 setup('authenticate', async ({ page, homePage, loginPage }) => {
   const [firstScenario] = scenarioData;
 
-  await setup.step('Open the event page and dismiss the cookie popup', async () => {
+  await setup.step('Open the event page', async () => {
     await homePage.openEvent(firstScenario.eventId);
-    await homePage.closeCookiePopup();
   });
 
   await setup.step('Sign in', async () => {

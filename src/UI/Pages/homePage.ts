@@ -18,13 +18,11 @@ export class HomePage extends BasePage {
     await this.goto(`${config.url}?sh=${encodeURIComponent(eventId)}`);
   }
 
-  async closeCookiePopup() {
-    try {
-      await this.cookieCloseButton.click({ timeout: 5000 });
+  async registerCookiePopupHandler() {
+    await this.page.addLocatorHandler(this.cookieCloseButton, async () => {
+      await this.cookieCloseButton.click();
       this.log.info('Cookie popup closed');
-    } catch {
-      this.log.debug('No cookie popup displayed');
-    }
+    });
   }
 
   async selectPriceByValueAndFindTickets(optionValue: string) {

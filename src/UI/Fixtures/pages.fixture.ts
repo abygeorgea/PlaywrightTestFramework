@@ -17,7 +17,9 @@ type PageFixtures = {
 
 export const test = base.extend<PageFixtures>({
   homePage: async ({ page }, use) => {
-    await use(new HomePage(page));
+    const homePage = new HomePage(page);
+    await homePage.registerCookiePopupHandler();
+    await use(homePage);
   },
   eventDetailsPage: async ({ page }, use) => {
     await use(new EventDetailsPage(page));

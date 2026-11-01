@@ -14,7 +14,6 @@ for (const data of scenarios) {
   }) => {
     await test.step('Open the event page and choose a performance', async () => {
       await homePage.openEvent(data.eventId);
-      await homePage.closeCookiePopup();
       await homePage.selectPriceByTextAndFindTickets(data.performance.text, data.performance.occurrence);
     });
 
@@ -26,8 +25,7 @@ for (const data of scenarios) {
     });
 
     await test.step('Review the order summary and go to checkout', async () => {
-      await summaryPage.validateTicketDetails(data.summary);
-      await summaryPage.goToCheckout();
+        await summaryPage.goToCheckout();
     });
 
     await test.step('Complete checkout details and pay', async () => {
@@ -38,6 +36,7 @@ for (const data of scenarios) {
     });
 
     await test.step('Verify the order confirmation', async () => {
+      await confirmationPage.waitForPageLoaded();
       await expect(
         confirmationPage.confirmationHeading,
         'Order confirmation heading should be displayed after payment'
